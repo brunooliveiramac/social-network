@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from perfis.models import Perfil
+from perfis.models import Perfil, Convite
 
 
 
@@ -8,7 +8,9 @@ def index(request):
 
 def exibir(request, id):
     perfil = Perfil.objects.get(id=id)
-    return render(request, 'perfil.html', { "perfil" : perfil })
+    perfil_logado = get_perfil_logado(request)
+    ja_eh_contato = perfil in perfil_logado.contatos.all()
+    return render(request, 'perfil.html', {'perfil' : perfil, 'perfil_logado' : get_perfil_logado(request), 'ja_eh_contato' : ja_eh_contato})
 
 def convidar(request, id):
     perfil_a_convidar = Perfil.objects.get(id=id)
@@ -18,3 +20,8 @@ def convidar(request, id):
 
 def get_perfil_logado(request):
    return Perfil.objects.get(id=1)     
+
+def aceitar(request, convite_id):
+  convite = Convite.objects.get(id=convite_id)
+  convite.aceitar()
+  return redirect('index')   
